@@ -1,17 +1,19 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
 from .models import User
 from .models import Post
 from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, "network/index.html")
-
+    posts = Post.objects.all().order_by('-timestamp')
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -78,3 +80,24 @@ def new_post(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/new_post.html")
+    
+def profile(request, username):
+    user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(user=user).order_by('-timestamp')
+    is_following = request.user in user.followers.all()
+
+    return render(request, "network/profile.html", {
+        "profile_user": user,
+        "posts": posts,
+        "is_following": is_following
+    })
+
+def follow_button(request, username):
+    user_to_follow = get_object_or_404(User, username=username)
+
+    if request.user in user_to_follow.followers.all():
+        user_to_follow.followers.remove(request.user)
+    else:
+        user_to_follow.followers.add(request.user)
+
+    return HttpResponseRedirect(reverse('profile', args=[username]))
