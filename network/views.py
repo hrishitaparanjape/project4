@@ -107,3 +107,17 @@ def follow_button(request, username):
         user_to_follow.followers.add(request.user)
 
     return HttpResponseRedirect(reverse('profile', args=[username]))
+
+@login_required
+def following(request):
+    user = request.user
+    following_users = user.following.all()
+    posts_list = Post.objects.filter(user__in=following_users).order_by('-timestamp')
+    paginator = Paginator(posts_list, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "network/index.html", {
+        "page_obj": page_obj
+    })
