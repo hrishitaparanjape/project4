@@ -7,12 +7,18 @@ from django.urls import reverse
 from .models import User
 from .models import Post
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 def index(request):
-    posts = Post.objects.all().order_by('-timestamp')
+    posts_list = Post.objects.all().order_by('-timestamp')
+    paginator = Paginator(posts_list, 10) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
-        "posts": posts
+        "page_obj": page_obj
     })
 
 def login_view(request):
