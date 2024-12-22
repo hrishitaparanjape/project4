@@ -11,6 +11,9 @@
                     <img src="{{ post.image_url }}" alt="Post Image" style="max-width: 300px; height: auto; border-radius: 10px; margin-top: 10px;">
                 {% endif %}
                 <p>Likes: 0</p>
+                {% if request.user == post.user %}
+                    <a href="{% url 'edit_post' post.id %}" class="btn btn-secondary" style="background-color: #4B0082; color: white; border: none;">Edit</a>
+                {% endif %}
             </div>
         {% endfor %}
         <div style="text-align: center;">

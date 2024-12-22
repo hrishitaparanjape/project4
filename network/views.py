@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -120,4 +120,23 @@ def following(request):
 
     return render(request, "network/index.html", {
         "page_obj": page_obj
+    })
+
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.user != post.user:
+        return HttpResponse("You are not allowed to edit this post.", status=403)
+
+    if request.method == "POST":
+        content = request.POST["content"]
+        image_url = request.POST["image_url"]
+        post.content = content
+        post.image_url = image_url
+        post.save()
+        return redirect("index")
+
+    return render(request, "network/edit_post.html", {
+        "post": post
     })
