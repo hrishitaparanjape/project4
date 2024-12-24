@@ -10,7 +10,11 @@
                 {% if post.image_url %}
                     <img src="{{ post.image_url }}" alt="Post Image" style="max-width: 300px; height: auto; border-radius: 10px; margin-top: 10px;">
                 {% endif %}
-                <p>Likes: 0</p>
+                <p>Likes: {{ post.likes.count }}</p>
+                <form action="{% url 'like_post' post.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary">❤️</button>
+                </form>
                 {% if request.user == post.user %}
                     <a href="{% url 'edit_post' post.id %}" class="btn btn-secondary" style="background-color: #4B0082; color: white; border: none;">Edit</a>
                 {% endif %}

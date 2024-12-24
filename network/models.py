@@ -10,7 +10,7 @@ class Post(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     image_url = models.URLField(blank=True, null=True)
-
+    likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
     def __str__(self):
         return f"{self.user.username}: {self.content[:30]}"
 
